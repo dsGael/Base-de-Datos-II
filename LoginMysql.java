@@ -6,18 +6,31 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-   
+import java.sql.DriverManager;
+
 public class LoginMysql{
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
   
-        String pwd="llllll";
-        byte[] hashed=getSHA(pwd);
-        String hashed64= hexString(hashed);
-        System.out.println("Hashed:"+hashed);
-        System.out.println("Hashed64: "+hashed64);
+      
+        String URL = "jdbc:mysql://148.225.60.126/disney?useSSL=false&useTimezone=true&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+        String db_user = "disney";
+        String db_password = "Ma58toAa!YLtT9S9";
+        String prg_user = "gael@gmail.com";
+        String prg_pwd  = "55555";
 
+        Connection conexion= getConnection(URL, db_user, db_password, prg_user, prg_pwd);
+        if (conexion!=null){
+            System.out.println("Bienvenido : "+prg_user);
+
+        }else{
+            System.out.println("Acceso Denegado");
+        }
+        try {
+            conexion.close();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
     }
    
     public static byte[] getSHA(String input) throws NoSuchAlgorithmException {
@@ -51,7 +64,7 @@ public class LoginMysql{
             ps.setString(2, pgr_password);
             ResultSet rs= ps.executeQuery();
             
-            
+
         }catch(Exception ex){
             System.out.println("getConnection():"+ex.getMessage());
         }
