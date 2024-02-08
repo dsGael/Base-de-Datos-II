@@ -15,7 +15,7 @@ public class LoginMysql{
       
         String URL = "jdbc:mysql://148.225.60.126/disney?useSSL=false&useTimezone=true&serverTimezone=UTC&allowPublicKeyRetrieval=true";
         String db_user = "disney";
-        
+         // 148.225.60.126/phpmyadmin
         String db_password = "Ma58toAa!YLtT9S9";
         String prg_user = "gael@gmail.com";
         String prg_pwd  = "55555";
