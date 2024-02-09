@@ -6,7 +6,34 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.sql.DriverManager;
+
+class Menu {
+    int level;
+    String type;
+    String menu;
+    String menu_text;
+    String query;
+
+    public Menu(int level, String type, String menu, String menu_text){
+        this.level = level;
+        this.type = type; // User or Admin
+        this.menu = menu;
+        this.menu_text = menu_text; // Display text
+        String query_user = "SELECT * FROM `menu_Gael` WHERE level IN (10,20) AND menu_Gael.user_role = 'USER';";
+        String query_admin = "SELECT * FROM `menu_Gael` WHERE level IN (10,20,30) AND menu_Gael.user_role = 'ADMIN';";
+        if (type.equals("USER")){
+            this.query = query_user;
+        } else {
+            this.query = query_admin;
+        }
+    }
+}
+
+
+
+
 
 public class LoginMysql{
 
@@ -33,6 +60,36 @@ public class LoginMysql{
             // TODO: handle exception
         }
     }
+
+    
+    public static ArrayList<Menu> getOptionMenu(Connection cnx, String role){
+        ArrayList<Menu> menu_list = new ArrayList<Menu>();
+       
+        String query_user = "SELECT * FROM `menu_Gael` WHERE level IN (10,20) AND menu_Gael.user_role = 'USER';";
+        String query_admin = "SELECT * FROM `menu_Gael` WHERE level IN (10,20,30) AND menu_Gael.user_role = 'ADMIN';";
+        String query="";
+        if(role.equals("USER")){
+            query=query_user;
+        }else{  
+            query=query_admin;
+        }
+        try{
+            PreparedStatement ps= cnx.prepareStatement(query_user);
+            ResultSet rs= ps.executeQuery();
+            while (rs.next()){
+                String tipo = rs.getString(0);
+                String menu = rs.getString(1);
+                int level= (int) rs.getInt(2);
+                String menu_text = rs.getString(3);
+                Menu menu_row=(new Menu(level, tipo, menu, menu_text));
+                menu_list.add(menu_row);
+            }
+        }catch(Exception ex){
+            System.out.println("getOptionMenu():"+ex.getMessage());
+        }
+        return menu_list;
+    }
+
    
     public static byte[] getSHA(String input) throws NoSuchAlgorithmException {
         byte[] hash = null;
