@@ -9,36 +9,9 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.sql.DriverManager;
 
-class Menu {
-    int level;
-    String type;
-    String menu;
-    String menu_text;
-    String query;
-
-    public Menu(int level, String type, String menu, String menu_text){
-        this.level = level;
-        this.type = type; // User or Admin
-        this.menu = menu;
-        this.menu_text = menu_text; // Display text
-        String query_user = "SELECT * FROM `menu_Gael` WHERE level IN (10,20) AND menu_Gael.user_role = 'USER';";
-        String query_admin = "SELECT * FROM `menu_Gael` WHERE level IN (10,20,30) AND menu_Gael.user_role = 'ADMIN';";
-        if (type.equals("USER")){
-            this.query = query_user;
-        } else {
-            this.query = query_admin;
-        }
-    }
-}
-
-
-
-
 
 public class LoginMysql{
-
     public static void main(String[] args) throws NoSuchAlgorithmException {
-  
       
         String URL = "jdbc:mysql://148.225.60.126/disney?useSSL=false&useTimezone=true&serverTimezone=UTC&allowPublicKeyRetrieval=true";
         String db_user = "disney";
@@ -50,6 +23,7 @@ public class LoginMysql{
         Connection conexion= getConnection(URL, db_user, db_password, prg_user, prg_pwd);
         if (conexion!=null){
             System.out.println("Bienvenido : "+prg_user);
+            mainCycle(conexion,prg_user)
 
         }else{
             System.out.println("Acceso Denegado");
@@ -59,6 +33,11 @@ public class LoginMysql{
         } catch (Exception e) {
             // TODO: handle exception
         }
+    
+    }
+
+    public static void mainCycle(Connection cnx, String user){
+
     }
 
     
@@ -129,4 +108,27 @@ public class LoginMysql{
         return cnx;
     }
 
+}
+
+class Menu {
+    int level;
+    String type;
+    String menu;
+    String menu_text;
+    String query;
+
+    public Menu(int level, String type, String menu, String menu_text){
+        this.level = level;
+        this.type = type; // User or Admin
+        this.menu = menu;
+        this.menu_text = menu_text; // Display text
+        String query_user = "SELECT * FROM `menu_Gael` WHERE level IN (10,20) AND menu_Gael.user_role = 'user';";
+        String query_admin = "SELECT * FROM `menu_Gael` WHERE level IN (10,20,30) AND menu_Gael.user_role = 'admin';";
+        if (type.equals("user")){
+            this.query = query_user;
+        } else {
+            this.query = query_admin; 
+
+        }
+    }
 }
