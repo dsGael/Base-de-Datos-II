@@ -50,7 +50,7 @@ public class LoginMysql{
     public static String showMenu(ArrayList<Menu> menu_list){
         int i = 1;
         for (Menu menu : menu_list) {
-            System.out.println(i+":"+menu.menu_text);
+            System.out.println(i+":"+menu.subMenu.menu_text);
             i++;
         }
         Scanner scan = new Scanner(System.in);
@@ -68,8 +68,8 @@ public class LoginMysql{
     public static ArrayList<Menu> getOptionMenu(Connection cnx, String role){
         ArrayList<Menu> menu_list = new ArrayList<Menu>();
        
-        String query_user = "SELECT * FROM `menu_Gael`,`user_Gael` WHERE user_Gael.email='humberto@gmail.com' AND level IN (10,20) AND menu_Gael.user_role=user_Gael.role;";
-        String query_admin = "SELECT * FROM `menu_Gael`,`user_Gael` WHERE user_Gael.email='gael@gmail.com' AND menu_Gael.user_role=user_Gael.role;";
+        String query_user = "SELECT * FROM `menu_Gael`,`user_Gael` WHERE user_Gael.email='humberto@gmail.com' AND level IN (10,20) AND menu_Gael.user_role = user_Gael.role;";
+        String query_admin = "SELECT * FROM `menu_Gael`,`user_Gael` WHERE user_Gael.email='gael@gmail.com' AND menu_Gael.user_role = user_Gael.role;";
         String query="";
         query=query_user;
         try{
@@ -137,12 +137,14 @@ class Menu {
     String menu;
     String menu_text;
     String query;
+    ArrayList<Menu> subMenu;
 
     public Menu(int level, String type, String menu, String menu_text){
         this.level = level;
         this.type = type; // User or Admin
         this.menu = menu;
         this.menu_text = menu_text; // Display text
+        this.subMenu=null;
         String query_user = "SELECT * FROM `menu_Gael` WHERE level IN (10,20) AND menu_Gael.user_role = 'USER';";
         String query_admin = "SELECT * FROM `menu_Gael` WHERE level IN (10,20,30) AND menu_Gael.user_role = 'ADMIN';";
         if (type.equals("USER")){
@@ -151,5 +153,18 @@ class Menu {
             this.query = query_admin; 
 
         }
+    }
+
+    public void addSubMenu(Menu parent , Menu child){
+        if(parent!=null){
+            if(parent.subMenu!=null){
+                parent.subMenu.add(child);
+            }else{
+                parent.subMenu= new ArrayList<>();
+                parent.subMenu.add(child);
+            }
+        }
+
+
     }
 }
