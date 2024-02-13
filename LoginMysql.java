@@ -73,7 +73,7 @@ public class LoginMysql{
         String query="";
         query=query_user;
         try{
-            PreparedStatement ps= cnx.prepareStatement(query_user);
+            PreparedStatement ps= cnx.prepareStatement(query_admin);
             
             ResultSet rs= ps.executeQuery();
             while (rs.next()){
