@@ -44,7 +44,7 @@ public class LoginMysql{
         do{
             option=showMenu(menu_list);
             System.out.println(option);
-        }while(option.equals("0"));
+        }while(!option.equals("0"));
     }
 
     public static String showMenu(ArrayList<Menu> menu_list){
