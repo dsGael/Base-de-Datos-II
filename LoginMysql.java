@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.sql.DriverManager;
 
 
 public class LoginMysql{
@@ -44,6 +43,7 @@ public class LoginMysql{
         String option = "0";
         do{
             option=showMenu(menu_list);
+            System.out.println(option);
         }while(option.equals("0"));
     }
 
@@ -58,7 +58,7 @@ public class LoginMysql{
         System.out.println("Seleccione una opción: ");
         String option=scan.nextLine();
         if (!option.equals("0")){
-            int idx=Integer.parseInt(option);
+            int idx=Integer.parseInt(option)-1;
             option=menu_list.get(idx).menu;
         }
         return option;
@@ -77,10 +77,10 @@ public class LoginMysql{
             
             ResultSet rs= ps.executeQuery();
             while (rs.next()){
-                String tipo = rs.getString(0);
-                String menu = rs.getString(1);
-                int level= (int) rs.getInt(2);
-                String menu_text = rs.getString(3);
+                String tipo = rs.getString(1);
+                String menu = rs.getString(2);
+                int level= (int) rs.getInt(3);
+                String menu_text = rs.getString(4);
                 Menu menu_row=(new Menu(level, tipo, menu, menu_text));
                 menu_list.add(menu_row);
             }
