@@ -62,21 +62,23 @@ public class LoginMysql{
         System.out.println("Seleccione una opción: ");
         String option=scan.nextLine();
         if (!option.equals("0")){
-            int idx=Integer.parseInt(option)-1;
+            int idx=Integer.parseInt(option);
             option=menuList.get(idx).menu;
         }
         return option;
     }
 
     public static void showMenu(ArrayList<Menu> menu_list){
-        
+        int i =0;
         for (Menu menu : menu_list) {
             if(menu.level%10==0){
                 System.out.println("** "+menu.menu_text+" **");
                // showMenu(menu.subMenu);
             } else {
-                System.out.println(" "+menu.level+":"+menu.menu_text);
+                
+                System.out.println(" "+i+":"+menu.menu_text);
             }
+            i++;
             
 
         }
