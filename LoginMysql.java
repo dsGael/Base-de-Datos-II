@@ -40,35 +40,53 @@ public class LoginMysql{
 
     public static void mainCycle(Connection cnx, String user){
         ArrayList<Menu> menu_list = getOptionMenu(cnx, user);
+        Menu parent=menu_list.get(0);
+        for (Menu menu: menu_list){
+            if(menu.level%10==0){
+                parent=menu;
+            }else{
+                parent.addSubMenu(parent, menu);
+            }
+        }
         String option = "0";
         do{
-            option=showMenu(menu_list);
+            showMenu(menu_list);
+            option=getMenu(menu_list);
             System.out.println(option);
         }while(!option.equals("0"));
     }
 
-    public static String showMenu(ArrayList<Menu> menu_list){
-        int i = 1;
-        for (Menu menu : menu_list) {
-            System.out.println(i+":"+menu.subMenu.menu_text);
-            i++;
-        }
+    public static String getMenu(ArrayList <Menu> menuList){
         Scanner scan = new Scanner(System.in);
-        System.out.println("0: Salir");
+        System.out.println(" 0: Salir");
         System.out.println("Seleccione una opción: ");
         String option=scan.nextLine();
         if (!option.equals("0")){
             int idx=Integer.parseInt(option)-1;
-            option=menu_list.get(idx).menu;
+            option=menuList.get(idx).menu;
         }
         return option;
+    }
+
+    public static void showMenu(ArrayList<Menu> menu_list){
+        
+        for (Menu menu : menu_list) {
+            if(menu.level%10==0){
+                System.out.println("** "+menu.menu_text+" **");
+               // showMenu(menu.subMenu);
+            } else {
+                System.out.println(" "+menu.level+":"+menu.menu_text);
+            }
+            
+
+        }
     }
 
     
     public static ArrayList<Menu> getOptionMenu(Connection cnx, String role){
         ArrayList<Menu> menu_list = new ArrayList<Menu>();
        
-        String query_user = "SELECT * FROM `menu_Gael`,`user_Gael` WHERE user_Gael.email='humberto@gmail.com' AND level IN (10,20) AND menu_Gael.user_role = user_Gael.role;";
+        String query_user = "SELECT * FROM `menu_Gael`,`user_Gael` WHERE user_Gael.email='humberto@gmail.com' AND menu_Gael.user_role = user_Gael.role;";
         String query_admin = "SELECT * FROM `menu_Gael`,`user_Gael` WHERE user_Gael.email='gael@gmail.com' AND menu_Gael.user_role = user_Gael.role;";
         String query="";
         query=query_user;
