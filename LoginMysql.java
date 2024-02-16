@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -53,7 +54,63 @@ public class LoginMysql{
             showMenu(menu_list);
             option=getMenu(menu_list);
             System.out.println(option);
+            executeMenuOption(cnx, option);
         }while(!option.equals("0"));
+    }
+
+    public static void executeMenuOption(Connection cnx, String option){
+        switch (option) {
+            case "LIST_USERS":
+                listUsers(cnx);
+                break;
+            case "ADD_USER":
+
+                break;
+            case "DELETE_USER":
+                break;
+            case "UPDATE_USER":
+                break;
+            
+            default:
+                break;
+        }
+
+    }
+
+    public static void displayRecords(ResultSet rs){
+        try{
+            
+            ResultSetMetaData rsmd = rs.getMetaData();
+            int columnsNumber = rsmd.getColumnCount();
+            
+            for (int i = 1; i <= columnsNumber; i++) {
+                System.out.print(rsmd.getColumnName(i)+"  |\t");
+
+            }
+            
+            while (rs.next()) {
+                System.out.println();
+                for (int i = 1; i <= columnsNumber; i++) {
+                    System.out.print(rs.getString(i)+"  |\t");
+                    
+                }System.out.println();
+               
+            }
+        }catch(Exception ex){
+            System.out.println("displayRecords():"+ex.getMessage());
+        }
+           
+    }
+
+    private static void listUsers(Connection cnx) {
+        String query="SELECT username,email,role FROM user_Gael";
+        try{
+            PreparedStatement ps= cnx.prepareStatement(query);
+            ResultSet rs= ps.executeQuery();
+            displayRecords(rs);
+        }catch(Exception ex){
+            System.out.println("listUsers():"+ex.getMessage());
+        }
     }
 
     public static String getMenu(ArrayList <Menu> menuList){
