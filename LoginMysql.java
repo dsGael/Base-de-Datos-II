@@ -18,7 +18,7 @@ public class LoginMysql{
         String db_user = "disney";
          // 148.225.60.126/phpmyadmin
         String db_password = "Ma58toAa!YLtT9S9";
-        String prg_user = "gael@gmail.com";
+        String prg_user = "humberto@gmail.com";
         String prg_pwd  = "55555";
         //QUERY PARA EL ROL DE USER
         // SELECT * FROM `menu_Gael`,`user_Gael` WHERE user_Gael.email='humberto@gmail.com' AND level IN (10,20) AND menu_Gael.user_role=user_Gael.role;
@@ -59,9 +59,23 @@ public class LoginMysql{
     }
 
     public static void executeMenuOption(Connection cnx, String option){
+        String SQL="";
         switch (option) {
             case "LIST_USERS":
-                listUsers(cnx);
+                SQL="SELECT username,email,role FROM user_Gael";
+                listRecords(SQL,cnx);
+                break;
+            case "LIST_SHOWS":
+                SQL="SELECT * FROM shows LIMIT 0,40";
+                listRecords(SQL,cnx);
+                break;
+            case "TOP_RATINGS":
+                SQL="SELECT * FROM `vista_gael_ratings` ";
+                listRecords(SQL,cnx);
+                break;
+            case "TOPTEN_RATING":
+                SQL="SELECT * FROM `vista_gael_ratings` LIMIT 0,10";
+                listRecords(SQL,cnx);
                 break;
             case "ADD_USER":
 
@@ -84,34 +98,37 @@ public class LoginMysql{
             int columnsNumber = rsmd.getColumnCount();
             
             for (int i = 1; i <= columnsNumber; i++) {
-                System.out.print(rsmd.getColumnName(i)+"  |\t");
-
+                System.out.printf("%30s ",rsmd.getColumnName(i));
+                
             }
-            
             while (rs.next()) {
                 System.out.println();
                 for (int i = 1; i <= columnsNumber; i++) {
-                    System.out.print(rs.getString(i)+"  |\t");
+                    System.out.printf("%30s ",rs.getString(i));
                     
-                }System.out.println();
+                }
+                
                
-            }
+            }System.out.println("\n");
         }catch(Exception ex){
             System.out.println("displayRecords():"+ex.getMessage());
         }
            
     }
 
-    private static void listUsers(Connection cnx) {
-        String query="SELECT username,email,role FROM user_Gael";
+    private static void listRecords(String SQL, Connection cnx) {
+        String query="";
         try{
-            PreparedStatement ps= cnx.prepareStatement(query);
+            PreparedStatement ps= cnx.prepareStatement(SQL);
             ResultSet rs= ps.executeQuery();
             displayRecords(rs);
+            //System.out.println("\n");
         }catch(Exception ex){
             System.out.println("listUsers():"+ex.getMessage());
         }
     }
+
+
 
     public static String getMenu(ArrayList <Menu> menuList){
         Scanner scan = new Scanner(System.in);
@@ -130,7 +147,7 @@ public class LoginMysql{
         for (Menu menu : menu_list) {
             if(menu.level%10==0){
                 System.out.println("** "+menu.menu_text+" **");
-               // showMenu(menu.subMenu);
+              
             } else {
                 
                 System.out.println(" "+i+":"+menu.menu_text);
@@ -142,16 +159,18 @@ public class LoginMysql{
     }
 
     
-    public static ArrayList<Menu> getOptionMenu(Connection cnx, String role){
+    public static ArrayList<Menu> getOptionMenu(Connection cnx, String user){
         ArrayList<Menu> menu_list = new ArrayList<Menu>();
        
-        String query_user = "SELECT * FROM `menu_Gael`,`user_Gael` WHERE user_Gael.email='humberto@gmail.com' AND menu_Gael.user_role = user_Gael.role;";
-        String query_admin = "SELECT * FROM `menu_Gael`,`user_Gael` WHERE user_Gael.email='gael@gmail.com' AND menu_Gael.user_role = user_Gael.role;";
+        String query_user = "SELECT * FROM `menu_Gael`,`user_Gael` WHERE user_Gael.email=? AND menu_Gael.user_role = user_Gael.role;";
+        String query_admin = "SELECT * FROM `menu_Gael`,`user_Gael` WHERE user_Gael.email=? AND menu_Gael.user_role = user_Gael.role;";
         String query="";
         query=query_user;
+        
         try{
-            PreparedStatement ps= cnx.prepareStatement(query_admin);
-            
+           
+            PreparedStatement ps= cnx.prepareStatement(query);
+            ps.setString(1, user);
             ResultSet rs= ps.executeQuery();
             while (rs.next()){
                 String tipo = rs.getString(1);
