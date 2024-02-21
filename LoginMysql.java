@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -20,8 +21,7 @@ public class LoginMysql{
         String db_password = "Ma58toAa!YLtT9S9";
         String prg_user = "humberto@gmail.com";
         String prg_pwd  = "55555";
-        //QUERY PARA EL ROL DE USER
-        // SELECT * FROM `menu_Gael`,`user_Gael` WHERE user_Gael.email='humberto@gmail.com' AND level IN (10,20) AND menu_Gael.user_role=user_Gael.role;
+       
 
         Connection conexion= getConnection(URL, db_user, db_password, prg_user, prg_pwd);
         if (conexion!=null){
@@ -34,7 +34,7 @@ public class LoginMysql{
         try {
             conexion.close();
         } catch (Exception e) {
-            // TODO: handle exception
+            System.out.println("main():"+e.getMessage());
         }
     
     }
@@ -65,8 +65,12 @@ public class LoginMysql{
                 SQL="SELECT username,email,role FROM user_Gael";
                 listRecords(SQL,cnx);
                 break;
+            case "ADD_RATING":
+                addRating(cnx);
+                break;
+            
             case "LIST_SHOWS":
-                SQL="SELECT * FROM shows LIMIT 0,40";
+                SQL="SELECT * FROM shows LIMIT 0,15";
                 listRecords(SQL,cnx);
                 break;
             case "TOP_RATINGS":
@@ -77,7 +81,9 @@ public class LoginMysql{
                 SQL="SELECT * FROM `vista_gael_ratings` LIMIT 0,10";
                 listRecords(SQL,cnx);
                 break;
-            case "ADD_USER":
+            case "SHOW_LOG":
+                SQL="SELECT * FROM `zlog_Gael` ORDER BY id DESC LIMIT 0,10 ";
+                listRecords(SQL, cnx);
 
                 break;
             case "DELETE_USER":
@@ -91,6 +97,24 @@ public class LoginMysql{
 
     }
 
+    public static void addRating(Connection cnx){
+        Scanner scan= new Scanner(System.in);
+        System.out.println("Ingrese el show: ");
+        String show= scan.nextLine();
+        String SQL="SELECT show_id,title FROM shows WHERE title LIKE ? ORDER BY title";
+        show="%"+show+"%";
+        try {
+            PreparedStatement ps = cnx.prepareStatement(SQL);
+            ps.setString(1, show);
+            SQL=ps.toString();
+            SQL=SQL.substring(SQL.indexOf(":")+1);
+            System.out.println();
+            listRecords(SQL, cnx);
+
+        } catch (SQLException e) {
+           
+        }
+    }
     public static void displayRecords(ResultSet rs){
         try{
             
@@ -98,13 +122,13 @@ public class LoginMysql{
             int columnsNumber = rsmd.getColumnCount();
             
             for (int i = 1; i <= columnsNumber; i++) {
-                System.out.printf("%30s ",rsmd.getColumnName(i));
+                System.out.printf("%-30s",rsmd.getColumnName(i).toUpperCase());
                 
             }
             while (rs.next()) {
                 System.out.println();
                 for (int i = 1; i <= columnsNumber; i++) {
-                    System.out.printf("%30s ",rs.getString(i));
+                    System.out.printf("%-30s",rs.getString(i));
                     
                 }
                 
@@ -117,12 +141,12 @@ public class LoginMysql{
     }
 
     private static void listRecords(String SQL, Connection cnx) {
-        String query="";
+        
         try{
             PreparedStatement ps= cnx.prepareStatement(SQL);
             ResultSet rs= ps.executeQuery();
             displayRecords(rs);
-            //System.out.println("\n");
+            
         }catch(Exception ex){
             System.out.println("listUsers():"+ex.getMessage());
         }
@@ -165,7 +189,7 @@ public class LoginMysql{
         String query_user = "SELECT * FROM `menu_Gael`,`user_Gael` WHERE user_Gael.email=? AND menu_Gael.user_role = user_Gael.role;";
         String query_admin = "SELECT * FROM `menu_Gael`,`user_Gael` WHERE user_Gael.email=? AND menu_Gael.user_role = user_Gael.role;";
         String query="";
-        query=query_user;
+        query=query_admin;
         
         try{
            
