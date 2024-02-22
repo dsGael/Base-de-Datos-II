@@ -19,7 +19,7 @@ public class LoginMysql{
         String db_user = "disney";
          // 148.225.60.126/phpmyadmin
         String db_password = "Ma58toAa!YLtT9S9";
-        String prg_user = "humberto@gmail.com";
+        String prg_user = "gaelborchardt@gmail.com";
         String prg_pwd  = "55555";
        
 
@@ -54,11 +54,11 @@ public class LoginMysql{
             showMenu(menu_list);
             option=getMenu(menu_list);
             System.out.println(option);
-            executeMenuOption(cnx, option);
+            executeMenuOption(cnx, option, user);
         }while(!option.equals("0"));
     }
 
-    public static void executeMenuOption(Connection cnx, String option){
+    public static void executeMenuOption(Connection cnx, String option, String user){
         String SQL="";
         switch (option) {
             case "LIST_USERS":
@@ -66,7 +66,7 @@ public class LoginMysql{
                 listRecords(SQL,cnx);
                 break;
             case "ADD_RATING":
-                addRating(cnx);
+                addRating(cnx,user);
                 break;
             
             case "LIST_SHOWS":
@@ -97,7 +97,7 @@ public class LoginMysql{
 
     }
 
-    public static void addRating(Connection cnx){
+    public static void addRating(Connection cnx, String user){
         Scanner scan= new Scanner(System.in);
         System.out.println("Ingrese el show: ");
         String show= scan.nextLine();
@@ -111,10 +111,36 @@ public class LoginMysql{
             System.out.println();
             listRecords(SQL, cnx);
 
+            SQL="SELECT id FROM users WHERE email=?";
+            ps=cnx.prepareStatement(SQL);
+            ps.setString(1, user);
+            ResultSet rs=ps.executeQuery();
+            int id=0;
+            while (rs.next()) {
+                id=rs.getInt(1);
+            }
+            System.out.println("Ingrese el show_id: ");
+            String show_id=scan.nextLine();
+            System.out.println("Ingrese el comentario: ");
+            String comentario=scan.nextLine();
+            System.out.println("Ingrese el rating: ");
+            int rating=scan.nextInt();
+            
+            SQL="INSERT INTO `ratings_Gael` (`id_user`, `id_show`, `rating`, `comments` ) VALUES ( ?, ?, ?, ?)";
+            ps=cnx.prepareStatement(SQL);
+            
+            ps.setInt(1, id);
+            ps.setString(2, show_id);
+            ps.setInt(3, rating);
+            ps.setString(4, comentario);
+            ps.executeUpdate();
+
         } catch (SQLException e) {
-           
+           System.out.println("addRating():"+e.getMessage());
         }
     }
+    
+
     public static void displayRecords(ResultSet rs){
         try{
             
