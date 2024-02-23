@@ -68,13 +68,16 @@ public class LoginMysql{
             case "ADD_RATING":
                 addRating(cnx,user);
                 break;
+            case "MOD_RATING":
+                modRating(cnx,user);
+                break;
             
             case "LIST_SHOWS":
                 SQL="SELECT * FROM shows LIMIT 0,15";
                 listRecords(SQL,cnx);
                 break;
             case "TOP_RATINGS":
-                SQL="SELECT * FROM `vista_gael_ratings` ";
+                SQL="SELECT * FROM `vista_ratings_todos` LIMIT 0,10 ";
                 listRecords(SQL,cnx);
                 break;
             case "TOPTEN_RATING":
@@ -96,6 +99,35 @@ public class LoginMysql{
         }
 
     }
+
+    private static void modRating(Connection cnx, String user) {
+       String SQL="SELECT ratings_Gael.id, ratings_Gael.id_show, shows.title, ratings_Gael.rating, ratings_Gael.timestamp FROM ratings_Gael, shows,users WHERE users.email=? AND users.id=ratings_Gael.id_user AND ratings_Gael.id_show=shows.show_id ORDER BY timestamp DESC LIMIT 0,10 ";
+       Scanner scan= new Scanner(System.in); 
+       try {
+            PreparedStatement ps = cnx.prepareStatement(SQL);
+            ps.setString(1, user);
+            SQL=ps.toString();
+            SQL=SQL.substring(SQL.indexOf(":")+1);
+            System.out.println();
+            listRecords(SQL, cnx);
+
+            System.out.println("Ingrese el id del rating a modificar: ");
+            String rating_id=scan.nextLine();
+            System.out.println("Ingrese el nuevo rating: ");
+            int rating_nuevo=scan.nextInt();
+            SQL="UPDATE `ratings_Gael` SET `rating` = ? WHERE `ratings_Gael`.`id` = ?;";
+            ps=cnx.prepareStatement(SQL);
+            ps.setInt(1, rating_nuevo);
+            ps.setString(2, rating_id);
+            int r= ps.executeUpdate();
+            System.out.println("Updated Records:"+r);
+            
+        }catch (SQLException e) {
+            System.out.println("modRating():"+e.getMessage());
+        }
+    }
+
+
 
     public static void addRating(Connection cnx, String user){
         Scanner scan= new Scanner(System.in);
@@ -133,7 +165,8 @@ public class LoginMysql{
             ps.setString(2, show_id);
             ps.setInt(3, rating);
             ps.setString(4, comentario);
-            ps.executeUpdate();
+            int r= ps.executeUpdate();
+            System.out.println("Inserted Records:"+r);
 
         } catch (SQLException e) {
            System.out.println("addRating():"+e.getMessage());
