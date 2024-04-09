@@ -148,6 +148,7 @@ public class LoginMysql{
             ps.setString(1, user);
             ResultSet rs=ps.executeQuery();
             int id=0;
+            String name="";
             while (rs.next()) {
                 id=rs.getInt(1);
             }
@@ -167,6 +168,14 @@ public class LoginMysql{
             ps.setString(4, comentario);
             int r= ps.executeUpdate();
             System.out.println("Inserted Records:"+r);
+            SQL = "UPDATE users a INNER JOIN (SELECT COUNT(*) AS num_reviews FROM vista_ratings WHERE name=? GROUP BY name) b SET a.reviews = b.num_reviews WHERE a.name = ?";
+            ps = cnx.prepareStatement(SQL);
+            ps.setString(1, name);
+            ps.setString(2, name);
+            System.out.println(ps.toString());
+            r = ps.executeUpdate();
+            System.out.println("Updated "+r+" records...");
+            cnx.commit();
 
         } catch (SQLException e) {
            System.out.println("addRating():"+e.getMessage());
