@@ -76,6 +76,9 @@ public class LoginMysql{
                 SQL="SELECT * FROM shows LIMIT 0,15";
                 listRecords(SQL,cnx);
                 break;
+            case "DEL_RATING":
+                deleteRating(cnx, user);
+                break;
             case "TOP_RATINGS":
                 SQL="SELECT * FROM `vista_ratings_todos` LIMIT 0,10 ";
                 listRecords(SQL,cnx);
@@ -127,6 +130,53 @@ public class LoginMysql{
         }
     }
 
+     private static void deleteRating(Connection cnx, String user) {
+       String SQL="SELECT ratings_Gael.id, ratings_Gael.id_show, shows.title, ratings_Gael.rating, ratings_Gael.timestamp FROM ratings_Gael, shows,users WHERE users.email=? AND users.id=ratings_Gael.id_user AND ratings_Gael.id_show=shows.show_id ORDER BY timestamp DESC LIMIT 0,10 ";
+       Scanner scan= new Scanner(System.in); 
+       try {
+            PreparedStatement ps = cnx.prepareStatement(SQL);
+            ps.setString(1, user);
+            SQL=ps.toString();
+            SQL=SQL.substring(SQL.indexOf(":")+1);
+            System.out.println(SQL);
+            listRecords(SQL, cnx);
+
+            System.out.println("¿Que registro desea borrar? ");
+            String registro=scan.nextLine();
+            cnx.setAutoCommit(false);
+            SQL="DELETE FROM `ratings_Gael` WHERE `ratings_Gael`.`id` = ?;";
+
+            ps=cnx.prepareStatement(SQL);
+            ps.setString(1, registro);
+            int r= ps.executeUpdate();
+            System.out.println("Deleted Records:"+r);
+            
+            
+            cnx.commit();
+
+            SQL="SELECT id FROM users WHERE email=?";
+            ps=cnx.prepareStatement(SQL);
+            ps.setString(1, user);
+            ResultSet rs=ps.executeQuery();
+            int id=0;
+            String name="";
+            while (rs.next()) {
+                id=rs.getInt(1);
+            }
+            SQL = "UPDATE users a INNER JOIN (SELECT COUNT(*) AS num_reviews FROM vista_ratings_Gael WHERE name=? GROUP BY name) b SET a.reviews = b.num_reviews WHERE a.name = ?";
+            ps = cnx.prepareStatement(SQL);
+            ps.setString(1, name);
+            ps.setString(2, name);
+            System.out.println(ps.toString());
+            r = ps.executeUpdate();
+            System.out.println("Updated "+r+" records...");
+            cnx.commit();
+
+        }catch (SQLException e) {
+            System.out.println("delRating():"+e.getMessage());
+        }
+    }
+
 
 
     public static void addRating(Connection cnx, String user){
@@ -168,7 +218,8 @@ public class LoginMysql{
             ps.setString(4, comentario);
             int r= ps.executeUpdate();
             System.out.println("Inserted Records:"+r);
-            SQL = "UPDATE users a INNER JOIN (SELECT COUNT(*) AS num_reviews FROM vista_ratings WHERE name=? GROUP BY name) b SET a.reviews = b.num_reviews WHERE a.name = ?";
+            cnx.setAutoCommit(false);
+            SQL = "UPDATE users a INNER JOIN (SELECT COUNT(*) AS num_reviews FROM vista_ratings_Gael WHERE name=? GROUP BY name) b SET a.reviews = b.num_reviews WHERE a.name = ?";
             ps = cnx.prepareStatement(SQL);
             ps.setString(1, name);
             ps.setString(2, name);
